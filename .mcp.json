@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "skill-hub": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.skill_hub"],
+      "cwd": "/Users/ikmx/source/personal/RENGA"
+    }
+  }
+}

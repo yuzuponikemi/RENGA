@@ -1,0 +1,20 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.ruff_cache/
+.mypy_cache/
+dist/
+
+# Secrets
+.env
+
+# Catalog: runtime state (not tracked)
+catalog/.contributors.json
+
+# Output: Copilot Studio YAMLs (generated, not tracked)
+output/copilot_topics/
+
+# Data: raw logs (not tracked)
+data/synthetic_logs.json

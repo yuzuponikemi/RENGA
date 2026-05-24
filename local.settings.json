@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AZURE_FOUNDRY_ENDPOINT": "",
+    "AZURE_FOUNDRY_API_KEY": "",
+    "AZURE_FOUNDRY_DEPLOYMENT": "DeepSeek-V4-Flash"
+  }
+}

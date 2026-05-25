@@ -8137,5 +8137,168 @@
     "created_at": "2026-05-24T11:36:04.716370+00:00",
     "usage_count": 0,
     "contributor_handles": []
+  },
+  {
+    "skill_id": "da252363-50f3-4728-9916-7216554158dd",
+    "name": "環境構築・トラブル解決",
+    "description": "Python環境構築やエラー解決の手順を質問するスキル",
+    "template_prompt": "私は{OS}で{プロジェクト名}を開発しています。{現在の状況}という状態です。{発生している問題}を解決したいです。{希望する解決方法}で対応してください。{追加情報}",
+    "variables": [
+      "OS",
+      "プロジェクト名",
+      "現在の状況",
+      "発生している問題",
+      "希望する解決方法",
+      "追加情報"
+    ],
+    "variable_descriptions": {
+      "OS": "使用しているOS（例: macOS, Windows, Linux）",
+      "プロジェクト名": "作業中のプロジェクト名（例: あなたのプロジェクト名）",
+      "現在の状況": "現在の環境や実行中のコマンド（例: venv内でアプリを実行中）",
+      "発生している問題": "具体的なエラーや問題（例: ModuleNotFoundError, コマンドが見つからない）",
+      "希望する解決方法": "希望する解決手段（例: uvを使ってvenv作成、requirements.txtのインストール）",
+      "追加情報": "その他の補足情報（例: エラーログ、バージョン情報）"
+    },
+    "example_use_cases": [
+      "Pythonモジュールのインストールエラーが発生したとき",
+      "仮想環境の作成方法がわからないとき",
+      "Dockerやデータベースのセットアップ手順を確認したいとき"
+    ],
+    "instances": [
+      {
+        "instance_id": "52bd1cea-ef15-450c-91a8-d6c2cc4fbd17",
+        "parent_skill_id": "da252363-50f3-4728-9916-7216554158dd",
+        "name": "モジュール不足エラー解決",
+        "filled_prompt": "私はmacOSで{プロジェクト名}を開発しています。venv内でpython app.pyを実行中という状態です。ModuleNotFoundError: No module named 'langchain_text_splitters'という問題を解決したいです。uvを使って必要なモジュールをインストールしてください。エラーログは以下です：\n(venv) {ユーザー名}@{ホスト名} {プロジェクト名} % python app.py      \n/{パス}/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\nTraceback (most recent call last):\n  File \"/{パス}/app.py\", line 6, in <module>\n    from document_processor.file_handler import DocumentProcessor\n  File \"/{パス}/document_processor/file_handler.py\", line 8, in <module>\n    from langchain_text_splitters import MarkdownHeaderTextSplitter\nModuleNotFoundError: No module named 'langchain_text_splitters'",
+        "variable_values": {
+          "OS": "macOS",
+          "プロジェクト名": "{プロジェクト名}",
+          "現在の状況": "venv内でpython app.pyを実行中",
+          "発生している問題": "ModuleNotFoundError: No module named 'langchain_text_splitters'",
+          "希望する解決方法": "uvを使って必要なモジュールをインストール",
+          "追加情報": "エラーログは以下です：\n(venv) {ユーザー名}@{ホスト名} {プロジェクト名} % python app.py      \n/{パス}/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\nTraceback (most recent call last):\n  File \"/{パス}/app.py\", line 6, in <module>\n    from document_processor.file_handler import DocumentProcessor\n  File \"/{パス}/document_processor/file_handler.py\", line 8, in <module>\n    from langchain_text_splitters import MarkdownHeaderTextSplitter\nModuleNotFoundError: No module named 'langchain_text_splitters'"
+        },
+        "source_prompt": "(venv) {ユーザー名}@{ホスト名} {プロジェクト名} % python app.py      \n/{パス}/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\nTraceback (most recent call last):\n  File \"/{パス}/app.py\", line 6, in <module>\n    from document_processor.file_handler import DocumentProcessor\n  File \"/{パス}/document_processor/file_handler.py\", line 8, in <module>\n    from langchain_text_splitters import MarkdownHeaderTextSplitter\nModuleNotFoundError: No module named 'langchain_text_splitters'\n(venv) {ユーザー名}@{ホスト名} {プロジェクト名} % \n\ncould you check my current python version, and if it has all the requirements?"
+      },
+      {
+        "instance_id": "05659af2-3db9-422f-a1ea-6b0bc3da52af",
+        "parent_skill_id": "da252363-50f3-4728-9916-7216554158dd",
+        "name": "uvでvenv作成",
+        "filled_prompt": "私はmacOSで{プロジェクト名}を開発しています。python -m venv .venvを実行したらzsh: command not found: pythonという状態です。pythonコマンドが見つからない問題を解決したいです。uvを使ってvenvを作成してください。追加情報はありません。",
+        "variable_values": {
+          "OS": "macOS",
+          "プロジェクト名": "{プロジェクト名}",
+          "現在の状況": "python -m venv .venvを実行したらzsh: command not found: python",
+          "発生している問題": "pythonコマンドが見つからない",
+          "希望する解決方法": "uvを使ってvenvを作成",
+          "追加情報": "なし"
+        },
+        "source_prompt": "{ユーザー名}@{ホスト名} {プロジェクト名} % python -m venv .venv\nzsh: command not found: python\n{ユーザー名}@{ホスト名} {プロジェクト名} % \n\ncan you create the venv for me using uv"
+      },
+      {
+        "instance_id": "0f98249d-c689-4ef5-bd0a-0646a2d746e0",
+        "parent_skill_id": "da252363-50f3-4728-9916-7216554158dd",
+        "name": "Docker+Neo4j設定確認",
+        "filled_prompt": "私はmacOSで{プロジェクト名}を開発しています。docker compose upが完了したという状態です。s.envファイルの設定が正しいか確認したいです。ユーザー名やURLを修正する必要があるかもしれません。Dockerファイルとws.envファイルも作成済みで、Neo4jをセットアップしています。",
+        "variable_values": {
+          "OS": "macOS",
+          "プロジェクト名": "{プロジェクト名}",
+          "現在の状況": "docker compose upが完了した",
+          "発生している問題": "s.envファイルの設定が正しいか確認したい",
+          "希望する解決方法": "ユーザー名やURLを修正する必要があるかもしれません",
+          "追加情報": "Dockerファイルとws.envファイルも作成済みで、Neo4jをセットアップしています"
+        },
+        "source_prompt": "okay now docker is running and compose up done, but can you re-check my s.env file settings, is it okay as is? I think we might have to fix the username or URL or ?"
+      }
+    ],
+    "source_count": 15,
+    "unique_user_count": 1,
+    "triggers": [
+      "モジュールがインストールできない",
+      "venvの作り方教えて",
+      "エラーが出たので見てほしい",
+      "uvで環境構築したい",
+      "docker composeの設定を確認して"
+    ],
+    "category": "操作手順の質問",
+    "status": "public",
+    "anonymized": true,
+    "created_at": "2026-05-25T01:03:17.099561+00:00",
+    "usage_count": 0,
+    "contributor_handles": [
+      "#A1"
+    ]
+  },
+  {
+    "skill_id": "9b21b5f3-02a0-4219-af90-d31762993c9a",
+    "name": "コード解析とドキュメント化",
+    "description": "コードベースを解析し、構造・データフローを図解したドキュメントを作成",
+    "template_prompt": "{リポジトリ名}のコードベースを解析し、{解析対象}の全体像を{図形式}で図解した{ドキュメント種類}を作成してください。{追加要件}",
+    "variables": [
+      "リポジトリ名",
+      "解析対象",
+      "図形式",
+      "ドキュメント種類",
+      "追加要件"
+    ],
+    "variable_descriptions": {
+      "リポジトリ名": "解析するリポジトリの名前やパス（例: 特定のプロジェクト名）",
+      "解析対象": "解析する具体的な範囲（例: ワークフロー全体、技術スタック、データフロー、特定の仕組み）",
+      "図形式": "使用する図の記法（例: Mermaid、PlantUML、テキスト図）",
+      "ドキュメント種類": "作成するドキュメントの形式（例: 説明書、詳細ドキュメント、マークダウンドキュメント）",
+      "追加要件": "その他の要件（例: 初心者向け解説、一般常識を含める、詳細に出力）"
+    },
+    "example_use_cases": [
+      "新規メンバー向けに既存システムのアーキテクチャドキュメントを作成する",
+      "特定のプロジェクトの内部構造を理解するための解説資料を作る",
+      "複雑なワークフローを持つツールの利用手順書を図解付きで作成する"
+    ],
+    "instances": [
+      {
+        "instance_id": "a2327a6d-e6e0-4170-bc38-bc51f61d78e8",
+        "parent_skill_id": "9b21b5f3-02a0-4219-af90-d31762993c9a",
+        "name": "GraphRAGワークフロー図解",
+        "filled_prompt": "{リポジトリ名}のコードベースを解析し、{解析対象}のワークフロー全体像を{図形式}で図解した{ドキュメント種類}を作成してください。初心者向けに一般常識も含めて詳細に解説し、コンテンツを充実させてください。",
+        "variable_values": {
+          "リポジトリ名": "{リポジトリ名}",
+          "解析対象": "{解析対象}",
+          "図形式": "{図形式}",
+          "ドキュメント種類": "{ドキュメント種類}",
+          "追加要件": "初心者向けに一般常識も含めて詳細に解説し、コンテンツを充実させて"
+        },
+        "source_prompt": "graphrag index --root ./ragtest　というコマンドを時効すると、extract-graph やcommunity-create などそれぞれの工程がcallされるみたいですが　全体像をワークフローの図にして理解できる説明書を作成してください"
+      },
+      {
+        "instance_id": "b8c80a63-b354-4e21-bd9a-e6cc587cdc0b",
+        "parent_skill_id": "9b21b5f3-02a0-4219-af90-d31762993c9a",
+        "name": "リポジトリ全体解説ドキュメント",
+        "filled_prompt": "{リポジトリ名}のコードベースを解析し、{解析対象}を{図形式}で図解した{ドキュメント種類}を作成してください。{追加要件}",
+        "variable_values": {
+          "リポジトリ名": "{リポジトリ名}",
+          "解析対象": "全体の構造や技術スタック、データフロー、特定の仕組み",
+          "図形式": "{図形式}",
+          "ドキュメント種類": "{ドキュメント種類}",
+          "追加要件": "指定したフォルダーを作成し、その中にデータフローやアーキテクチャを説明する図を含めて、初心者向けに一般常識も含めて詳細に解説"
+        },
+        "source_prompt": "このリポジトリをくまなく調べてから、全体の構造や技術スタック、データフロー、RAGの仕組みなどを解説するドキュメントを詳細に作成してください"
+      }
+    ],
+    "source_count": 4,
+    "unique_user_count": 1,
+    "triggers": [
+      "コードを解析してドキュメント化して",
+      "システムの全体像を図で説明して",
+      "リポジトリの構造を解説して",
+      "ワークフローを図にして説明書を作って",
+      "アーキテクチャをドキュメントにして"
+    ],
+    "category": "コード解析とドキュメント化",
+    "status": "public",
+    "anonymized": true,
+    "created_at": "2026-05-25T01:03:28.575590+00:00",
+    "usage_count": 0,
+    "contributor_handles": [
+      "#A1"
+    ]
   }
 ]

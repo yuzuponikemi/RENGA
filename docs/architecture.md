@@ -39,7 +39,7 @@ flowchart TD
         AGG --> COSMOS
         COSMOS --> ORGMCP
         COSMOS --> CS
-        COSMOS --> DASH
+        COSMOS --> DASH["FastAPI Dashboard<br/>Azure App Service<br/>skill-hub-dashboard.azurewebsites.net"]
     end
 
     subgraph INFRA["共通インフラ"]
@@ -170,6 +170,7 @@ sequenceDiagram
 | LLM | **Azure AI Foundry**（DeepSeek-V4-Flash） | 必須要件クリア |
 | 集約処理基盤 | **Azure Functions**（Timer + Aggregator） | 必須要件・加点 |
 | スキルカタログ（中央） | **Azure Cosmos DB**（5 コンテナ） | 推奨技術への加点 |
+| ダッシュボード API | **Azure App Service**（FastAPI / Python 3.11） | 加点 |
 | ソースコード・個人 repo | **GitHub** + **GitHub App** | 推奨技術への加点 |
 | セマンティック検索 | multilingual-E5-small（ローカル）+ Cosmos クエリ | — |
 | クラスタリング | HDBSCAN + UMAP | — |

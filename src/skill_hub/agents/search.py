@@ -28,7 +28,10 @@ class EmbeddingSearchIndex:
             self._matrix = None
             return
         texts = [
-            _PASSAGE_PREFIX + f"{s.name} {s.description} {s.template_prompt}"
+            _PASSAGE_PREFIX + " ".join(filter(None, [
+                s.name, s.description, s.template_prompt,
+                " ".join(s.triggers),
+            ]))
             for s in skills
         ]
         with warnings.catch_warnings():

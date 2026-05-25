@@ -1,6 +1,7 @@
 import json
 from openai import OpenAI
 from ..models import ExtractedSkill
+from ._utils import _strip_fences
 
 ANONYMIZE_PROMPT = """あなたはプロンプトテンプレートの匿名化・一般化の専門家です。
 
@@ -60,12 +61,7 @@ class AnonymizerAgent:
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
         )
-        raw = response.choices[0].message.content.strip()
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-            raw = raw.strip()
+        raw = _strip_fences(response.choices[0].message.content.strip())
         if not raw:
             return skill.model_copy(update={"anonymized": True})
         data = json.loads(raw)

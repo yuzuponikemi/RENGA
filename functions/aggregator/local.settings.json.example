@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "COSMOS_ENDPOINT": "https://<account>.documents.azure.com:443/",
+    "COSMOS_KEY": "<cosmos master key>",
+    "COSMOS_DB": "skill-hub",
+    "RENGA_GITHUB_TOKEN": "<github PAT with repo:read scope>",
+    "RENGA_GITHUB_REPOS": "owner/repo1,owner/repo2",
+    "RENGA_GITHUB_BRANCH": "main"
+  }
+}

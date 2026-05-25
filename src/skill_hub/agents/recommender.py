@@ -3,6 +3,7 @@ from openai import OpenAI
 from ..catalog import SkillCatalog
 from ..models import ExtractedSkill
 from .search import EmbeddingSearchIndex
+from ._utils import _strip_fences
 
 RECOMMEND_PROMPT = """あなたはAIスキルの推薦エンジンです。
 
@@ -67,10 +68,5 @@ class RecommenderAgent:
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3,
         )
-        raw = response.choices[0].message.content.strip()
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-            raw = raw.strip()
+        raw = _strip_fences(response.choices[0].message.content.strip())
         return json.loads(raw)

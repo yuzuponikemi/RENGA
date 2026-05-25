@@ -8,39 +8,93 @@ from openai import OpenAI
 
 from src.skill_hub.agents.extractor import ExtractorAgent
 from src.skill_hub.agents.anonymizer import AnonymizerAgent
-from src.skill_hub.catalog import SkillCatalog
+from src.skill_hub.contributors import ContributorRegistry
 from src.skill_hub.output import skill_to_markdown, save_markdown
 from src.skill_hub.mcpify import export_yamls
-from src.skill_hub.log_readers import FolderLogReader, ClaudeCodeLogReader
+from src.skill_hub.log_readers import (
+    FolderLogReader,
+    ClaudeCodeLogReader,
+    VSCodeCopilotChatLogReader,
+    LogReader,
+)
+from src.skill_hub.models import CopilotLog
+from src.skill_hub.storage.personal import PersonalSkillCatalog
 
 load_dotenv()
 
 
-def build_log_reader():
-    """LOG_SOURCE 環境変数でログ入力を切り替える。
+class _MultiSourceLogReader(LogReader):
+    """複数 LogReader の結果を結合する。"""
+    def __init__(self, readers: list[LogReader]):
+        self.readers = readers
 
-    LOG_SOURCE=claude_code                   → ~/.claude/projects/ を全走査
-    LOG_SOURCE=claude_code+/p1:/p2           → 複数ディレクトリ（+区切り）
-    LOG_SOURCE=claude_code+/p1:/p2@myproj   → プロジェクトフィルタ付き
-    LOG_SOURCE=<path>                        → JSON ファイルまたはフォルダ
-    未設定                                   → data/synthetic_logs.json
+    def read(self) -> list[CopilotLog]:
+        out: list[CopilotLog] = []
+        for r in self.readers:
+            out.extend(r.read())
+        return out
+
+
+def _build_single_reader(source: str) -> LogReader:
+    """単一ソース表記から LogReader を組み立てる。
+
+    Formats:
+      claude_code                              → ~/.claude/projects/
+      claude_code+/p1:/p2                      → 複数ディレクトリ
+      claude_code@<project_filter>             → デフォルトパス + フィルタ
+      claude_code+/p1:/p2@<project_filter>     → 複数 + フィルタ
+      vscode_copilot                           → OS 既定の workspaceStorage を全走査
+      vscode_copilot+/custom/workspaceStorage  → カスタムパス
+      vscode_copilot@<workspace_filter>        → ワークスペース名フィルタ
+      vscode_copilot+/path@<filter>            → 両方
+      /abs/path or ./rel/path or *.json        → FolderLogReader
     """
-    source = os.environ.get("LOG_SOURCE", "")
-    if source.startswith("claude_code"):
-        rest = source[len("claude_code"):]
-        project_filter = None
-        dirs = "~/.claude/projects"
+    source = source.strip()
+
+    def _parse_config(prefix: str) -> tuple[str | None, str | None]:
+        """prefix の直後の +path / @filter を切り出す。"""
+        rest = source[len(prefix):]
+        path = None
+        filt = None
         if rest.startswith("+"):
             rest = rest[1:]
             if "@" in rest:
-                dirs, project_filter = rest.split("@", 1)
+                path, filt = rest.split("@", 1)
             else:
-                dirs = rest
-        return ClaudeCodeLogReader(projects_dir=dirs, project_filter=project_filter)
-    elif source:
-        return FolderLogReader(source)
-    else:
+                path = rest
+        elif rest.startswith("@"):
+            filt = rest[1:]
+        return (path or None, filt or None)
+
+    if source.startswith("claude_code"):
+        path, filt = _parse_config("claude_code")
+        return ClaudeCodeLogReader(
+            projects_dir=path or "~/.claude/projects",
+            project_filter=filt,
+        )
+    if source.startswith("vscode_copilot"):
+        path, filt = _parse_config("vscode_copilot")
+        return VSCodeCopilotChatLogReader(
+            workspace_storage_dir=path,
+            workspace_filter=filt,
+        )
+    return FolderLogReader(source)
+
+
+def build_log_reader():
+    """LOG_SOURCE 環境変数からログ入力を組み立てる。
+
+    単一: LOG_SOURCE=claude_code
+    複数: LOG_SOURCE=claude_code,vscode_copilot  (カンマ区切り)
+    未設定: data/synthetic_logs.json
+    """
+    raw = os.environ.get("LOG_SOURCE", "").strip()
+    if not raw:
         return FolderLogReader(str(Path(__file__).parent / "data" / "synthetic_logs.json"))
+    sources = [s for s in (s.strip() for s in raw.split(",")) if s]
+    if len(sources) == 1:
+        return _build_single_reader(sources[0])
+    return _MultiSourceLogReader([_build_single_reader(s) for s in sources])
 
 
 def build_client() -> tuple[OpenAI, str]:
@@ -91,11 +145,14 @@ def main() -> None:
     print(f"Loaded {len(logs)} logs")
 
     client, deployment = build_client()
-    catalog = SkillCatalog()
+    # main.py runs the extraction pipeline locally — always personal mode.
+    # Org-mode population happens via the Azure Function aggregator.
+    catalog = PersonalSkillCatalog()
+    registry = ContributorRegistry()
 
     # Step 1: Extract
     print("\n[Step 1] Extracting skill patterns...")
-    extractor = ExtractorAgent(client=client, model=deployment)
+    extractor = ExtractorAgent(client=client, model=deployment, registry=registry)
     raw_skills = extractor.run(logs)
     print(f"  → {len(raw_skills)} skill(s) extracted")
 

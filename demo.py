@@ -128,35 +128,50 @@ def main() -> None:
 
     # ── Scene 5: ダッシュボード (2:10-2:40) ───────────────────────────
     section("Scene 5: 匿名コントリビューションダッシュボード")
-    step("コントリビューター #A1 への通知（月次）:")
-    stats = catalog.stats()
-    print(f"""
-  ┌─────────────────────────────────────┐
-  │  🔮 Skill Hub — あなたの貢献レポート  │
-  ├─────────────────────────────────────┤
-  │  あなたのスキルが利用されました        │
-  │  利用回数:  {stats['total_usage']:>3} 回                  │
-  │  公開スキル: {stats['public']:>3} 件                  │
-  │  あなたの識別子: #A1 (内部のみ)      │
-  └─────────────────────────────────────┘""")
-    highlight("\n  → 本人には記録される。外からは #A1 しか見えない。")
+
+    all_skills = catalog.load_all()
+    skills_with_contributors = [s for s in all_skills if s.contributor_handles]
+    if skills_with_contributors:
+        target_handle = skills_with_contributors[0].contributor_handles[0]
+        contributed = [s for s in all_skills if target_handle in s.contributor_handles]
+        total_usage = sum(s.usage_count for s in contributed)
+        public_count = sum(1 for s in contributed if s.status.value == "public")
+        top = sorted(contributed, key=lambda x: -x.usage_count)[:3]
+
+        step(f"コントリビューター {target_handle} への通知（月次）:")
+        print(f"""
+  ┌─────────────────────────────────────────────┐
+  │  🔮 Skill Hub — あなたの貢献レポート          │
+  ├─────────────────────────────────────────────┤
+  │  貢献スキル: {len(contributed):>3} 件 (公開 {public_count:>3} 件)             │
+  │  累積利用回数: {total_usage:>3} 回                          │
+  │  あなたの識別子: {target_handle:<6} (本人のみ識別可)      │
+  ├─────────────────────────────────────────────┤
+  │  Top スキル:                                 │""")
+        for s in top:
+            name = s.name[:24]
+            print(f"  │   • {name:<26} {s.usage_count:>3}回 │")
+        print("  └─────────────────────────────────────────────┘")
+    else:
+        step("（貢献者ハンドルがまだ生成されていません。main.py を実行してください）")
+    highlight("\n  → 本人には記録される。外からはハンドルしか見えない。")
     input("\n  [Enter] →")
 
     # ── Scene 6: アーキテクチャ (2:40-3:00) ───────────────────────────
     section("Scene 6: アーキテクチャ")
     print("""
-  [Copilot Logs]
+  [Copilot Logs / Claude Code ログ]
        │
        ▼
-  ① Extractor Agent  ──→  成功パターン抽出 (k≥3)
+  ① Extractor Agent  ──→  成功パターン抽出 (k≥3 unique users)
        │
        ▼
   ② Anonymizer Agent ──→  固有名詞 → {{変数}}
        │
        ▼
-  [Cosmos DB]  ←─→  Azure AI Search
+  [catalog/skills.json] ──→ GitHub (CATALOG_PUSH=true)
        │
-  ③ Recommender Agent ──→  Copilot Studio UI
+  ③ Recommender Agent ──→  Copilot Studio UI / MCP
        │
   Auto-MCPify ─────────→  トピック YAML 自動生成
     """)

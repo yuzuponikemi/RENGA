@@ -40,6 +40,7 @@ class ExtractedSkill(BaseModel):
     instances: list[SkillInstance] = Field(default_factory=list)          # 具体インスタンス群
     source_count: int
     unique_user_count: int = 1
+    triggers: list[str] = Field(default_factory=list)
     category: str = ""
     status: SkillStatus = SkillStatus.PENDING
     anonymized: bool = False

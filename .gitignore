@@ -13,6 +13,11 @@ dist/
 # Catalog: runtime state (not tracked)
 catalog/.contributors.json
 
+# Azure Functions local secrets
+functions/aggregator/local.settings.json
+functions/*/.venv/
+functions/*/.python_packages/
+
 # Output: Copilot Studio YAMLs (generated, not tracked)
 output/copilot_topics/
 

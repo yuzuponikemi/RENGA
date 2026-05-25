@@ -9,14 +9,13 @@ from pydantic import BaseModel
 
 from src.skill_hub.agents.recommender import RecommenderAgent
 from src.skill_hub.agents.search import EmbeddingSearchIndex
-from src.skill_hub.catalog import SkillCatalog
-from src.skill_hub.contributors import ContributorRegistry
 from src.skill_hub.mcpify import export_yamls
+from src.skill_hub.models import SkillStatus
+from src.skill_hub.storage import make_catalog
 
 load_dotenv()
 
-catalog = SkillCatalog()
-registry = ContributorRegistry()
+catalog = make_catalog()
 _client: OpenAI | None = None
 _deployment: str = ""
 _search_index: EmbeddingSearchIndex = EmbeddingSearchIndex()
@@ -204,6 +203,37 @@ def rebuild_index():
     skills = catalog.get_public()
     _search_index.build(skills)
     return {"indexed": len(skills)}
+
+
+@app.get("/contributor/{handle}/report")
+def contributor_report(handle: str):
+    """匿名コントリビューターの貢献レポート。
+
+    自分のハンドル（本人のみ知る `#A1` など）で呼ぶと、
+    貢献したスキル数・累積利用回数・トップスキルを返す。
+    """
+    skills = catalog.load_all()
+    contributed = [s for s in skills if handle in s.contributor_handles]
+    if not contributed:
+        return {"handle": handle, "found": False}
+    public_count = sum(1 for s in contributed if s.status == SkillStatus.PUBLIC)
+    return {
+        "handle": handle,
+        "found": True,
+        "contributed_skills": len(contributed),
+        "public_skills": public_count,
+        "total_usage": sum(s.usage_count for s in contributed),
+        "top_skills": [
+            {
+                "skill_id": s.skill_id,
+                "name": s.name,
+                "category": s.category,
+                "usage_count": s.usage_count,
+                "status": s.status.value,
+            }
+            for s in sorted(contributed, key=lambda x: -x.usage_count)[:5]
+        ],
+    }
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ def check_outputs() -> bool:
     all_ok &= check("スキル数 >= 1", len(skills) >= 1, f"{len(skills)} 件")
     public = [s for s in skills if s["status"] == "public"]
     all_ok &= check("公開スキル >= 1", len(public) >= 1, f"{len(public)} 件")
-    md_files = list(Path("output/skills").glob("*.md"))
+    md_files = list(Path("output/skills").glob("*/SKILL.md"))
     all_ok &= check("Markdown ファイル生成", len(md_files) >= 1, f"{len(md_files)} 件")
     yaml_files = list(Path("output/copilot_topics").glob("*.yaml"))
     all_ok &= check("Copilot Studio YAML 生成", len(yaml_files) >= 1, f"{len(yaml_files)} 件")

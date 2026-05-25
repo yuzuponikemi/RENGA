@@ -9,27 +9,14 @@ user→assistant のペアを抽出して CopilotLog に変換する。
   accepted        = 直後の user メッセージが訂正でなければ True
   follow_up_count = 同セッション内でのフォローアップ数
   task_category   = cwd のプロジェクト名（最後のパスコンポーネント）
-  user_id         = セッション ID の先頭8文字
+  user_id         = USER_ID 環境変数 > git config user.email の SHA-256 > セッションID先頭8文字
 """
 import json
 from pathlib import Path
 from datetime import datetime
 from .base import LogReader
+from ._utils import resolve_user_id as _resolve_user_id, is_correction as _is_correction, is_system_message as _is_system_message
 from ..models import CopilotLog
-
-# ユーザーが訂正・否定しているとみなすキーワード
-_CORRECTION_PATTERNS = ("違う", "ちがう", "no ", "wrong", "incorrect", "そうじゃない", "やり直し")
-
-
-def _is_correction(text: str) -> bool:
-    t = text.lower()
-    return any(p in t for p in _CORRECTION_PATTERNS)
-
-
-_SYSTEM_PREFIXES = ("<task-notification>", "<system-reminder>", "<command-name>", "<user-prompt-submit-hook>")
-
-# ScheduleWakeup ループや CI フック由来のノイズを除外するマーカー
-_LOOP_MARKERS = ("Task output file:", "Check if regen_graph", "Check if re-extraction")
 
 
 def _extract_text(content: list | str) -> str:
@@ -52,15 +39,6 @@ def _extract_response(content: list | str) -> str:
     if tools:
         return f"[Tool calls: {', '.join(tools)}]"
     return ""
-
-
-def _is_system_message(text: str) -> bool:
-    t = text.strip()
-    if any(t.startswith(p) for p in _SYSTEM_PREFIXES):
-        return True
-    if any(marker in t for marker in _LOOP_MARKERS):
-        return True
-    return False
 
 
 def _project_name(cwd: str) -> str:
@@ -171,7 +149,7 @@ class ClaudeCodeLogReader(LogReader):
             session_id = user.get("sessionId", path.stem)
 
             results.append(CopilotLog(
-                user_id=session_id[:8],
+                user_id=_resolve_user_id(session_id),
                 timestamp=user.get("timestamp", datetime.utcnow().isoformat()),
                 prompt=prompt,
                 response=response,

@@ -4,7 +4,7 @@ from .models import ExtractedSkill, SkillStatus
 
 
 class SkillCatalog:
-    """Local JSON catalog. Cosmos DB 移行時はこのクラスだけ差し替える。"""
+    """Local JSON catalog backed by catalog/skills.json."""
 
     def __init__(self, path: str = "catalog/skills.json"):
         self.path = Path(path)

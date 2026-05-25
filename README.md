@@ -39,6 +39,8 @@
 
 ## セットアップ
 
+> 📘 別 PC からの参加手順（マルチユーザー登録・組織連携を含む）は [docs/getting_started.md](docs/getting_started.md) を参照してください。
+
 ```bash
 # 依存パッケージのインストール
 uv sync
